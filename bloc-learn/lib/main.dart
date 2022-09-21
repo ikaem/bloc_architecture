@@ -45,6 +45,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    // this will result in block lookup in each rebuild
+    // final bloc = context.read<CounterCubit>();
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
@@ -77,6 +79,24 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            TextButton(
+              onPressed: () {
+                context.read<CounterCubit>().increment();
+              },
+              child: Text("Incremeent here as well"),
+            ),
+            SizedBox(
+              height: 24,
+            ),
+            Builder(builder: (context) {
+              final counterState = context.watch<CounterCubit>().state;
+              // final counterState = context.watch<InternetCubit>().state;
+
+              return Text(
+                "This is Counter: ${counterState.counterValue}, and this is Internet: none",
+                style: Theme.of(context).textTheme.headline2,
+              );
+            }),
             const Text(
               'You have pushed the button this many times:',
             ),
@@ -121,6 +141,21 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             
              */
+
+            Builder(builder: (context) {
+              final value = context
+                  .select((CounterCubit value) => value.state.counterValue);
+
+              return Text("is is vlaue: $value");
+            }),
+            BlocBuilder<CounterCubit, CounterState>(
+              buildWhen: (previus, current) =>
+                  previus.counterValue != current.counterValue,
+              builder: (context, state) {
+                final valueOfCounter = state.counterValue;
+                return Text("This is in bloc builder");
+              },
+            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
